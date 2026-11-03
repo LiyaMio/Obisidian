@@ -1,0 +1,11 @@
+
+.obsidian/cache/
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/plugins/obsidian-git/data.json
+
+# 系统垃圾文件
+Thumbs.db
+.DS_Store
+*.tmp
+*.log
