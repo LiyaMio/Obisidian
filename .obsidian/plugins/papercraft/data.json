@@ -1,0 +1,48 @@
+{
+  "version": "1.0.1",
+  "language": "zh-CN",
+  "enabled": true,
+  "texture": {
+    "type": "none",
+    "textureOpacity": 0.15,
+    "textureScale": 1
+  },
+  "lines": {
+    "pattern": "none",
+    "gap": 38,
+    "thickness": 0.5,
+    "color": "rgba(100, 100, 100, 0.3)",
+    "marginLine": {
+      "enabled": false,
+      "position": 30,
+      "width": 2,
+      "color": "rgba(180, 50, 40, 0.4)"
+    }
+  },
+  "colors": {
+    "paperBackground": "",
+    "textColor": "",
+    "preset": "custom"
+  },
+  "typography": {
+    "fontFamily": "",
+    "fontSize": 16,
+    "letterSpacing": 0,
+    "lineHeight": 1.6,
+    "paragraphSpacing": 0,
+    "pageMargin": {
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "left": 0
+    }
+  },
+  "drawing": {
+    "enabled": false,
+    "showDrawingLayer": true,
+    "drawings": []
+  },
+  "activeTemplate": "",
+  "userTemplates": [],
+  "recentFonts": []
+}
