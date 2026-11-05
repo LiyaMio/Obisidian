@@ -1,4 +1,8 @@
 {
   "cssTheme": "Blue Topaz",
-  "accentColor": ""
+  "accentColor": "",
+  "textFontFamily": "Segoe UI",
+  "enabledCssSnippets": [
+    "snippets"
+  ]
 }
