@@ -8,7 +8,7 @@
     "textureScale": 1
   },
   "lines": {
-    "pattern": "dot",
+    "pattern": "none",
     "gap": 32,
     "thickness": 1,
     "color": "rgba(139, 90, 43, 0.18)",
@@ -20,21 +20,21 @@
     }
   },
   "colors": {
-    "paperBackground": "#F5ECD6",
-    "textColor": "#4A3A2A",
+    "paperBackground": "",
+    "textColor": "",
     "preset": "custom"
   },
   "typography": {
-    "fontFamily": "STSong",
-    "fontSize": 21,
-    "letterSpacing": 0.05,
-    "lineHeight": 1.65,
-    "paragraphSpacing": 8,
+    "fontFamily": "",
+    "fontSize": 16,
+    "letterSpacing": 0,
+    "lineHeight": 1.6,
+    "paragraphSpacing": 0,
     "pageMargin": {
-      "top": 40,
-      "right": 50,
-      "bottom": 40,
-      "left": 65
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "left": 0
     }
   },
   "drawing": {
@@ -42,7 +42,7 @@
     "showDrawingLayer": true,
     "drawings": []
   },
-  "activeTemplate": "old-book-grid",
+  "activeTemplate": "",
   "userTemplates": [],
   "recentFonts": []
 }
