@@ -2,6 +2,7 @@
   "obsidian-git",
   "highlightr-plugin",
   "obsidian-style-settings",
-  "papercraft",
-  "dynamic-outline"
+  "dynamic-outline",
+  "templater-obsidian",
+  "image-converter"
 ]

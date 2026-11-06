@@ -55,4 +55,88 @@ Agents frequently block on LLM inference and tool execution, making the *schedul
 Despite the diverse use cases, these workloads repeatedly access, filter, and aggregate overlapping parts of a trajectory. We next summarize common data operations into three requirements that a database engine should support,
 ### Structure-aware Retrieval
 **Session-structure retrieval**
-需求：不同workload对
+需求：不同workload对结构化轨迹的粒度需求不一样
+Session retrieval：当派生子Agent时，轨迹不再是线性的结构。（Fig1 left）
+Step retrieval：错误诊断通常在step粒度的轨迹上进行。
+Role retrieval：微调等操作通常使用基于角色的信息。
+![[TrajectoryDB-1793929418482.webp|339x364]]
+**Sequence retrieval**
+Many trajectory workloads identify patterns over *ordered events* rather than individual records.
+edit → failed test → edit the same file may indicate an ineffective strategy
+search → read → edit → passing test suggests a successful one
+### LLMs as UDFs
+UDF （User-Defined Function）
+Exposing LLM-based analysis as a general UDF allows the same semantic primitive to be reused across workloads and composed with other query operators.
+**Composing semantic and relational operators**
+semantic operators(LLM calls) need to compose with relational and order-sensitive operators throughout the query plan
+**Incremental semantic evaluation over growing trajectories**
+增量语义评估：Semantic predicates often operate on growing inputs, so their results must be updated statefully to remain valid as new evidence arrives.
+Semantic evaluation must build on previous state and incorporate new evidence as the trajectory grows.
+### Lineage Query
+**Context reconstruction**
+Long-running agents often *compact their context* by replacing earlier messages with summaries.
+**Preserving lineage for semantic operator**
+TrajectoryDB should preserve not only each semantic operator result, but also its provenance: the evaluated input, supporting trajectory records, judge model, evaluation criterion, and other information needed to reconstruct how the result was derived.
+This lineage serves two purposes. 
+允许无效：First, it enables invalidation: if the source trajectory changes, the memory becomes stale, or the judge model or criterion is updated, the system can identify which judgments need to be reevaluated. 
+支持来源查询：：Second, it supports provenance queries that ask what produced a judgment and which trajectory evidence supports it. 
+Semantic judgments therefore become *reusable derived data* rather than outputs of one-time LLM calls.
+## CHALLENGES AND OPPORTUNITIES
+![[TrajectoryDB-1793932107486.webp]]
+### Structure Reconstruction and Maintenance
+Trajectory structure is scattered across timestamped requests. Therefore, TrajectoryDB should reconstruct this structure and organize it both logically and physically.
+**Reconstructing Request Hierarchy.**
+<mark style="background: #FFB86CA6;">Challenge: Missing structural links.</mark>
+Design question: Which structures should be reconstructed eagerly?
+考虑到性能：TrajectoryDB must therefore determine which structural relationships to materialize during ingestion and which to derive lazily.
+<mark style="background: #FFB86CA6;">Challenge: Requests can be separated by long gaps.</mark>
+连续请求间隔较长。
+![[TrajectoryDB-1793933499689.webp]]
+Design question: How to maintain state for long-lived streaming trajectories?
+Existing stream-processing abstractions therefore do not naturally support incremental reconstruction of long-lived agent trajectories without assuming a bounded or predictable completion window.
+**Maintaining Graph Structure over Relational Data.**
+<mark style="background: #FFB86CA6;">Challenge: Trajectory relationships form graphs, not flat rows.</mark>
+Subagent execution creates *tree-shaped branches*, while lineage introduces labeled *many-to-many edges*: memories are derived from evidence, judgments are supported by or inconsistent with earlier records, and failures may be caused by or repeat earlier failures. Together, these relationships form *DAGs* over trajectory records.
+Design question: How to efficiently support both graph traversal and relational analytics?
+遍历需要递归，成本高。
+Agent trajectories are more specialized: they are append-only, mostly forest-shaped, and naturally clustered by session. Exploiting these properties may enable tighter integration of graph traversal with relational and ordered access.
+### Data Layout and Storage
+**Reconciling Conflicting Physical Layouts.**
+<mark style="background: #FFB86CA6;">Challenge: Use cases favor conflicting physical layouts.</mark>
+physical layouts 磁盘中的物理存储方式
+
+| Physical Layout                                                     | How Data Is Arranged on Disk                                                                                                                                           | Workloads That Need It                                                                                                    | Why It Conflicts                                                                                                                              |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Session-Contiguous Layout** _(Row/Session Locality)_              | Stores all messages, turns, and steps of a single session together in chronological sequence.                                                                          | **Replay, context reconstruction, sequence matching** (e.g., reading a full session history to replay or extract memory). | If you only want to analyze a single field (like error rates) across millions of sessions, reading entire sessions causes massive wasted I/O. |
+| **Columnar Layout** _(Attribute Locality)_                          | Stores values of the same field contiguously across millions of records (e.g., all `latency` values together, all `tool_name` values together).                        | **Telemetry analysis, cost monitor**ing, role filtering (e.g., aggregating token counts or finding all `tool` errors).    | If you need to reconstruct an entire conversation, gathering fields scattered across columns requires expensive multi-column reconstruction.  |
+| **Graph / Lineage-Linked Layout** _(Pointer/Relationship Locality)_ | Stores data clustered by parent–child or lineage relationships (e.g., grouping a derived memory together with the specific tool result and message that justified it). | **Root-cause provenance, memory verification, invalidation queries**.                                                     | Records related by lineage often span different turns, steps, or sessions, breaking both chronological session-order and column order.        |
+Design question: How should trajectories be physically organized for diverse access patterns?
+TrajectoryDB must therefore determine the primary representation, which auxiliary layouts or indexes to maintain, and how to keep them consistent as trajectories continuously grow.
+**Storing Large but Redundant Text Payload.**
+<mark style="background: #FFB86CA6;">Challenge: Trajectories are requests with cumulative context.</mark>
+上下文累积
+Design question: Should the text payload be stored inline or separately?
+TrajectoryDB therefore needs a layout that keeps large text efficient to scan without letting it dominate the record storage.
+<mark style="background: #FFB86CA6;">Challenge: Context is highly redundant, but not always prefix-aligned.</mark>
+Each request typically carries all the messages from the same session as accumulated context, often referred to as a *prefix*.
+In production, we observe that 80% of the sessions have context mutation: compaction, truncation of tool results, or edits to earlier context break prefix sharing.This makes it impossible to store only the newly appended turn.
+Design question: How to support prefix-aware text compression and deduplication?
+The storage engine should exploit this known sharing directly rather than rediscovering redundancy from raw bytes or literals within physical data blocks.
+### Query Language and Optimization
+**Enabling Order-Sensitive Query Processing.**
+<mark style="background: #FFB86CA6;">Challenge: Trajectory queries are often order-sensitive.</mark>
+A trajectory query model must therefore support both branch-local order and partial order(偏序) across branches.
+Design question: How to preserve order and optimize the query plan?
+A trajectory-aware engine should therefore track order through operators, reuse existing order rather than recompute it, propagate it through lineage traversal, and explicitly represent partial order across concurrent branches.
+**Co-optimization Across Relational and Semantic Operators.**
+<mark style="background: #FFB86CA6;">Challenge: Semantic operators consume and produce relational data.  </mark>
+Pushing a cheap telemetry filter before a semantic judge can reduce LLM invocations, whereas an early, highly selective semantic filter may avoid an expensive traversal.
+Design question: How to define a declarative framework to integrate semantic operators into the relational plan?
+**Caching Semantic Results.**
+<mark style="background: #FFB86CA6;">Challenge: Semantic results are expensive and ephemeral.</mark>
+Design question: When can a cached semantic result be safely reused?
+Existing semantic caches such as GPTCache and MeanCache  reuse LLM outputs by matching semantically similar inputs. This is insufficient for trajectory queries, where validity *depends not only on input similarity but also on the underlying trajectory state*.
+## RELATED WORK
+Semantic operators.
+Data lineage.
+## Conclusion
