@@ -55,3 +55,4 @@ Agents frequently block on LLM inference and tool execution, making the *schedul
 Despite the diverse use cases, these workloads repeatedly access, filter, and aggregate overlapping parts of a trajectory. We next summarize common data operations into three requirements that a database engine should support,
 ### Structure-aware Retrieval
 **Session-structure retrieval**
+需求：不同workload对
