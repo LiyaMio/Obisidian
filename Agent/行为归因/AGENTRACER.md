@@ -68,5 +68,27 @@ based on a widely used online RL method, Group Relative Policy Optimization (GRP
 **Online Reinforcement Learning**
 offline RL:离线强化学习。学习过程中，不与环境进行交互，只从dataset中直接学习，而dataset是采用别的策略收集的数据，并且采集数据的策略并不是近似最优策略。
 online RL:在线强化学习。学习过程中，智能体 需要和环境进行交互。并且在线强化学习可分为on-policy RL和off-policy RL。on-policy采用的是当前策略搜集的数据训练模型 ，每条数据仅使用一次。off-policy训练采用的数据不需要是当前策略搜集的。
+GRPO的核心思想是通过**组内相对奖励**来估计基线（baseline），从而避免使用额外的价值函数模型（critic model）。传统的PPO算法需要训练一个价值函数来估计优势函数（advantage function），而GRPO通过从同一问题的多个输出中计算平均奖励来替代这一过程，显著减少了内存和计算资源的消耗。
+论文定义公式（10）$\mathcal L_{\mathrm{RL}} = -\mathbb E \left[ \frac{1}{G} \sum_{k=1}^{G} \min\left( \rho_k A_k,\, \operatorname{clip}(\rho_k,1-B_s,1+B_s)A_k \right) \right]$在GRPO的损失函数参数上进行了部分调整
 
+**Multi-Granular Reward Design**
+evaluate both the correctness of the attribution and the structural integrity of the output
+$R(\hat p_k)=I_{\mathrm{format}} \left[ \lambda r_{\mathrm{step}}(\hat t_k) + (1-\lambda)r_{\mathrm{agent}}(\hat i_k) \right]$
+$I_{format}$（格式奖励）：要求模型按照固定格式输出推理结果和答案。
+例如：
+```
+<think>
+分析各个 Agent 的执行过程……
+</think>
+<answer>
+Agent B | 5
+</answer>
+```
+严格二元化，不满足要求为0。此外，为了准确提取，答案本身必须格式化为“agentID”|“stepID”。
+Agent-Level Reward：的 0/1 奖励：
+- 预测正确的 Agent：奖励为 1。
+- 预测错误的 Agent：奖励为 0。
+Step-level Reward：高斯核函数
+$r_{\mathrm{step}}(\hat t_k) = \exp\left( -\frac{(\hat t_k-t^*)^2}{2\sigma^2} \right)$
+## Experiments
 
