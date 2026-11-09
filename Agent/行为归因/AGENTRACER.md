@@ -91,4 +91,8 @@ Agent-Level Reward：的 0/1 奖励：
 Step-level Reward：高斯核函数
 $r_{\mathrm{step}}(\hat t_k) = \exp\left( -\frac{(\hat t_k-t^*)^2}{2\sigma^2} \right)$
 ## Experiments
-
+Dataset：TracerTraj-2.5K 目标任务包括：coding，通用ai，数学推理
+Environment. All experimental results are obtained on one server with 8 NVIDIA H100 (80 GB) GPUs
+Model & Parameter Configuration：分析agent和扰动操作在DeepseekR1上进行
+Benchmarks & Evaluation：使用Who&When 评估我们的微调模型，并在TracerTraj-2.5K上进行评估
+主要结论：主流模型不具备归因能力；AgenTracer在Agent和步骤级归因方面始终超越了CLAUDE4-SONNET等大型专有LLM；AgenTracer-8B将现成的代理系统提高了14%。AgenTracer-8B将现成的代理系统提高了14%
