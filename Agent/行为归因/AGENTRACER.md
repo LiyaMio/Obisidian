@@ -41,5 +41,14 @@ $a_t = π_{μ(t)}(s_t, H_t, Q), H_t ⊆ \{a_0, a_1, . . . , a_{t−1}\}.$
 The full execution trajectory of the system is denoted by: $τ = (s_0, a_0, s_1, a_1, . . . , s_T ),$
 **Objective Formulation.**
 decisive error : the earliest action in the trajectory whose correction is sufficient to steer the system from failure to success.
-Formally, let $Ω(τ ) ∈ {0, 1}$ be a binary evaluation function indicating failure $(Ω(τ ) = 0)$ or success $(Ω(τ ) = 1)$, and $R(τ, t, a^′_t)$ be an oracle rectification operator（校正算子）, which represents an idealized process where the original action at is replaced by a theoretically  perfect, oracle-provided action a′t, and all subsequent steps are re-simulated. Naturally, the set of all decisive agent-step pairs C(τ ) can be expressed as : $C(τ) = \{(i, t)\ |\ i = μ(t) \ \ and \ \ Ω(τ) = 0\ ∧\ Ω (R(τ, t, a^′_t)) = 1\} ,$
-
+Formally, let $Ω(τ ) ∈ {0, 1}$ be a binary evaluation function indicating failure $(Ω(τ ) = 0)$ or success $(Ω(τ ) = 1)$, and $R(τ, t, a^′_t)$ be an oracle rectification operator（校正算子）, which represents an idealized process where the original action at is replaced by a theoretically  perfect, oracle-provided action a′t, and all subsequent steps are re-simulated. Naturally, the set of all decisive agent-step pairs C(τ ) can be expressed as :
+$C(τ) = \{(i, t)\ |\ i = μ(t) \ \ and \ \ Ω(τ) = 0\ ∧\ Ω (R(τ, t, a^′_t)) = 1\} ,$
+$Ω(τ) = 0$ 任务失败；$R(τ, t, a^′_t)$ 反事实修正算子；
+可能有多个不同步骤，单独修正后都能够让系统成功
+所以论文接着提出公式（5）：$(i^*,t^*)=arg min_{(i,t) \in C(τ)}t$ 从所有能够通过单步修正使任务成功的候选步骤中，选择时间最早的那一个。
+## Methodology
+![[AGENTRACER-1794186415918.webp]]
+### AgenTracer: AUTOMATIC TRAJECTORY ANNOTATION
+**Collection**
+从M=6的多Agent系统中进行轨迹提取，对于每个MAS进行一系列的查询，采集查询后的成功 $Ω(τ) = 1$与失败轨迹 $Ω(τ) = 0$。
+**Locating Decisive Errors**
