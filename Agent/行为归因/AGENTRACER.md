@@ -8,7 +8,7 @@ multi-granular（多粒度） reinforcement learning
 LLM 多任务表现出色，但是依赖单模型存在固有局限。
 MAS 出现，性能优于单模型，但是多个自主代理与辅助模块（e.g, 外部工具）的集成加剧了系统的脆弱性。举例说明，系统失败率高。
 A natural response to this challenge is *failure attribution*, i.e., the precise identification of faulty components within the system upon task failure.
-错误归因的重要性，也可以说是引用
+错误归因的重要性，也可以说是应用
 (I) system debugging, by enabling agentic systems to perform more effective self-debugging across iterative attempts, thereby enhancing performance; 
 (II) data efficiency, by leveraging failed agent trajectories to construct more informative training data; 
 (III) grounded self-improvement, by facilitating grounded self-correction through precise agent credit assignment. （代理信用分配）
