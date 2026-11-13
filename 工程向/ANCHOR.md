@@ -103,3 +103,5 @@ Context Exhaustion（上下文耗尽）、Precision Degradation（精度下降�
 ![[ANCHOR-1794468910476.webp]]
 **A. System Overview**
 **B. Schema-Agnostic Extraction**
+通用实体关系抽取
+1) Input Preprocessing: recursive characterbased splitting strategy
