@@ -105,3 +105,8 @@ Context Exhaustion（上下文耗尽）、Precision Degradation（精度下降�
 **B. Schema-Agnostic Extraction**
 通用实体关系抽取
 1) Input Preprocessing: recursive characterbased splitting strategy
+按照以下优先级寻找分割位置：
+ Paragraph boundaries：段落边界。
+ Sentence boundaries：句子边界。
+ Word boundaries：单词边界。
+2) Knowledge Extraction: 
