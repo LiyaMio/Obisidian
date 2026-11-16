@@ -104,9 +104,27 @@ Context Exhaustion（上下文耗尽）、Precision Degradation（精度下降�
 **A. System Overview**
 **B. Schema-Agnostic Extraction**
 通用实体关系抽取
-1) Input Preprocessing: recursive characterbased splitting strategy
+1) Input Preprocessing: recursive characterbased splitting strategy 递归字符分割策略
 按照以下优先级寻找分割位置：
  Paragraph boundaries：段落边界。
  Sentence boundaries：句子边界。
  Word boundaries：单词边界。
 2) Knowledge Extraction: 
+<mark style="background: #FFB8EBA6;">Entity extraction</mark>：使用专用LLM从分片中提取命名实体（a concrete object or referent in the text）
+Each extracted entity is represented as a tuple (name, type hint, properties), where *type hint* is a short phrase that guides ontology class search, and properties captures clearly stated literal attributes (e.g., implementation language, alias, first-seen date).
+Name Normalization：使用规范化后的 Key 进行跨 Chunk 统一，避免将同一实体重复记录。
+<mark style="background: #FFB8EBA6;">Coreference resolution（共指消解）</mark>：The LLM replaces anaphoric references（回指引用） (pronouns（代词）, role descriptors, near-demonstratives（近指示词）) with the corresponding canonical entity name from the unified list, reducing misattributed or missing relations caused by unresolved anaphora.
+<mark style="background: #FFB8EBA6;">Triplet extraction（三元组提取）</mark>：
+两阶段设计：entities first, relations second
+应对两个问题：subject-bias 主语偏好（过度生成突出实体的关系，而忽略不太突出的实体）；dangling references 悬空引用（最终清单中缺少关系端点）
+两类三元组：
+ObjectProperty Triplets：$(e_s,p,e_o)$ 例如：$(Trojan.Bemstour,exploits,CVE\text{-}2019\text{-}0703)$并且会保存对应的原始证据句，供后续本体映射使用。实体-关系-实体 关系具有方向
+DatatypeProperty Triplets：$(e,p,literal)$ 例如：$(DoublePulsar,alias,"Backdoor.DoubleParser")$ 实体-属性谓词-具体字面值
+3) Post-processing and Filtering：
+
+|步骤|作用|示例|
+|---|---|---|
+|IoC Detection|识别 IOC 并修正类型提示|IPv4、SHA-256|
+|Noise Filtering|去除非实体信息|时间表达、过短字符串|
+|Duplicate Removal|合并重复实体和关系|合并相同规范化 Key|
+**C. Hybrid Ontology Discovery**
