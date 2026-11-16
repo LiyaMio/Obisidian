@@ -4,5 +4,6 @@
   "textFontFamily": "Segoe UI",
   "enabledCssSnippets": [
     "snippets"
-  ]
+  ],
+  "showRibbon": true
 }

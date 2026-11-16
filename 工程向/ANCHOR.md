@@ -128,3 +128,26 @@ DatatypeProperty Triplets：$(e,p,literal)$ 例如：$(DoublePulsar,alias,"Backd
 |Noise Filtering|去除非实体信息|时间表达、过短字符串|
 |Duplicate Removal|合并重复实体和关系|合并相同规范化 Key|
 **C. Hybrid Ontology Discovery**
+将抽取的三元组与正式的本体类别对齐。
+Hybrid ontology discovery provides this alignment through a uniform tool-based interface between the LLM agent and any OWL/SHACL ontology.
+1) **Entity Ontology Typing:**
+![[ANCHOR-1794796945062.webp]]
+
+|算法阶段|要解决的问题|使用的信息|
+|---|---|---|
+|Step 1|能不能快速找到合适的本体元素？|Embedding 相似度、关键词等|
+|Step 2|如果全局搜索不可靠，应当到本体的哪个分支寻找？|LLM、类别描述、继承结构|
+|Step 3|在找到的分支内，哪个具体属性最合适？|局部属性集合、语义和类型信息|
+相似度用的是余弦相似度
+**D. Knowledge Graph Construction with SHACL Validation**
+找到正确的本体类别和属性，不代表最终知识图谱一定满足该本体的结构要求。
+
+| 阶段                        | 解决的问题                     |
+| ------------------------- | ------------------------- |
+| Hybrid Ontology Discovery | 某个实体或谓词应该映射到哪个 URI？       |
+| SHACL Validation          | 使用这些 URI 构建的知识图谱是否满足结构约束？ |
+SHACL （Shapes Constraint Language）它用于描述和验证 RDF 图中的结构约束。可以把它简单理解成：为知识图谱定义一套需要满足的检查规则。
+ANCHOR 不是要求 LLM 重新构建整个知识图谱，而是让它针对违反约束的部分重新调用合适的 Ontology Discovery 工具。
+三次之后还没修正成功怎么办？ 保留该实体及其映射类型，同时添加 Validation Warning。
+
+![[ANCHOR-1794798155988.webp]]
