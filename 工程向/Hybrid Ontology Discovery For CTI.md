@@ -13,13 +13,13 @@ keywords: Cyber threat intelligence（网络威胁情报）, ontology（本体�
 | **Conceptualization(概念化)** | 抽象模型,而非具体数据 | 描述"世界上有哪些类型的事物",而不是"张三上周买了什么" |
 一个完整的知识本体通常包含以下组成部分：
 
-|要素|说明|示例（电影领域）|
-|---|---|---|
-|**Class（类）**|概念的集合|Movie, Person, Genre|
-|**Property（属性）**|描述特征的数据|title, releaseDate, rating|
-|**Relation（关系）**|类之间的关联|directedBy, actedIn, belongsTo|
-|**Instance（实例）**|具体的个体|"Inception", "Christopher Nolan"|
-|**Axiom（公理/规则）**|约束和推理规则|一部电影至少有一个导演|
+| 要素               | 说明      | 示例（电影领域）                         |
+| ---------------- | ------- | -------------------------------- |
+| **Class（类）**     | 概念的集合   | Movie, Person, Genre             |
+| **Property（属性）** | 描述特征的数据 | title, releaseDate, rating       |
+| **Relation（关系）** | 类之间的关联  | directedBy, actedIn, belongsTo   |
+| **Instance（实例）** | 具体的个体   | "Inception", "Christopher Nolan" |
+| **Axiom（公理/规则）** | 约束和推理规则 | 一部电影至少有一个导演                      |
 
 | 概念                        | 回答的问题                          | 结构      | 例子                                        |
 | ------------------------- | ------------------------------ | ------- | ----------------------------------------- |
@@ -133,11 +133,11 @@ Hybrid ontology discovery provides this alignment through a uniform tool-based i
 1) **Entity Ontology Typing:**
 ![[ANCHOR-1794796945062.webp]]
 
-|算法阶段|要解决的问题|使用的信息|
-|---|---|---|
-|Step 1|能不能快速找到合适的本体元素？|Embedding 相似度、关键词等|
-|Step 2|如果全局搜索不可靠，应当到本体的哪个分支寻找？|LLM、类别描述、继承结构|
-|Step 3|在找到的分支内，哪个具体属性最合适？|局部属性集合、语义和类型信息|
+| 算法阶段   | 要解决的问题                  | 使用的信息              |
+| ------ | ----------------------- | ------------------ |
+| Step 1 | 能不能快速找到合适的本体元素？         | Embedding 相似度、关键词等 |
+| Step 2 | 如果全局搜索不可靠，应当到本体的哪个分支寻找？ | LLM、类别描述、继承结构      |
+| Step 3 | 在找到的分支内，哪个具体属性最合适？      | 局部属性集合、语义和类型信息     |
 相似度用的是余弦相似度
 **D. Knowledge Graph Construction with SHACL Validation**
 找到正确的本体类别和属性，不代表最终知识图谱一定满足该本体的结构要求。
