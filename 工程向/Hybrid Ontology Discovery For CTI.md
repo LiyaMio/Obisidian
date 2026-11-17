@@ -122,11 +122,11 @@ ObjectProperty Triplets：$(e_s,p,e_o)$ 例如：$(Trojan.Bemstour,exploits,CVE\
 DatatypeProperty Triplets：$(e,p,literal)$ 例如：$(DoublePulsar,alias,"Backdoor.DoubleParser")$ 实体-属性谓词-具体字面值
 3) Post-processing and Filtering：
 
-|步骤|作用|示例|
-|---|---|---|
-|IoC Detection|识别 IOC 并修正类型提示|IPv4、SHA-256|
-|Noise Filtering|去除非实体信息|时间表达、过短字符串|
-|Duplicate Removal|合并重复实体和关系|合并相同规范化 Key|
+| 步骤                | 作用             | 示例           |
+| ----------------- | -------------- | ------------ |
+| IoC Detection     | 识别 IOC 并修正类型提示 | IPv4、SHA-256 |
+| Noise Filtering   | 去除非实体信息        | 时间表达、过短字符串   |
+| Duplicate Removal | 合并重复实体和关系      | 合并相同规范化 Key  |
 **C. Hybrid Ontology Discovery**
 将抽取的三元组与正式的本体类别对齐。
 Hybrid ontology discovery provides this alignment through a uniform tool-based interface between the LLM agent and any OWL/SHACL ontology.
