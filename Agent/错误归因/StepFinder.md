@@ -1,0 +1,32 @@
+- **标题：** StepFinder: A Temporal Semantic Framework for Failure Attribution in Multi-Agent Systems
+- **会议：** ACM SIGKDD 2026
+- **研究任务：** Multi-Agent Systems Failure Attribution
+- **核心目标：** 从失败的多智能体执行轨迹中定位导致任务失败的根因步骤。
+## Contribution
+1. **将失败归因重新表述为结构化时序建模问题**We reformulate MAS failure attribution as a structured temporal modeling problem. This perspective allows us to shift the heavy reasoning burden from LLMs to a specialized deep learning architecture.
+2. **出 StepFinder 时序语义归因框架**We propose StepFinder, a lightweight temporal semantic framework designed to identify the root cause step by assigning an explicit error score to each step. 
+3. Experiments demonstrate that StepFinder achieves superior attribution precision and ranking quality while significantly reducing inference l
+## Introduction
+MAS 虽然具备较强的协作能力，但内部存在明显的脆弱性（Internal Fragility）。
+在代表性基准测试中，MAS 的失败率可以达到 41%–86.7%。
+- **Error Occurrence**：错误最初发生的位置。
+- **Error Propagation**：错误向后续步骤传播。
+- **Failure Manifestation**：错误最终表现为任务失败。
+已有 LLM 自动诊断方法虽然取得了一定进展，但通常只能取得较好的 Agent-level 诊断效果，缺乏足够准确的 Step-level 定位能力。
+**第一阶段：Trajectory Encoding**
+将每个执行步骤中的两类信息编码：$x_t=(c_t,r_t)$
+其中：
+- $c_t$：Agent 在当前步骤产生的执行内容；
+- $r_t$：执行该步骤的 Agent 身份。
+然后通过 Embedding 模型得到语义向量。
+**第二阶段：Temporal and Interaction Modeling**
+作者采用混合结构：
+- BiLSTM：提取执行轨迹中的时序依赖；
+- Agent-Aware Attention：建模不同步骤之间的交互关系；
+- Agent-Aware Gating：利用整体 Agent 信息调节特征。
+**第三阶段：Step-Level Error Scoring**
+给每个步骤计算错误分数，再通过：
+- Multi-Scale Differencing；
+- Position Bias；
+调整最终得分
+## Related Work
