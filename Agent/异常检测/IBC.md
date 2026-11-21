@@ -66,3 +66,44 @@ IBC（Intention–Behavior Consistency）框架由两个核心模块组成
 IBC：$\text{Behavior Logs} \rightarrow \text{Intention Reconstruction} \rightarrow \text{Consistency Verification} \rightarrow \text{Attribution}$
 **4.2 Intention Reconstruction：从日志到意图**
 IRA 利用 LLM 的 ToM 能力，从原始运行日志中推断每个 Agent 行为背后的预期意图。
+限制：
+ - 意图必须对应实现目标的方法或计划。Intention poses a problem: The agent must determine a method or plan to achieve the intention. 
+ - 新意图不能与 Agent 已有的意图或信念发生冲突。Intention provides a filter: The adoption of a new intention must not conflict with the agent’s existing intentions or beliefs. 
+ - 意图应当保持一定的持续性，除非目标已经完成，或者 Agent 主动撤销意图。Intention maintains persistence: The intention should persist unless it is satisfied or actively rescinded, avoiding frequent, unjustified changes.
+ - Agent 不应当形成自己认为无法实现的意图。The Agent believes it’s intention is feasible: The agent will not intend to do something it believes is impossible.
+ - 如果 Agent 相信自己的意图无法实现，就应当放弃该意图。The Agent does not believe it will fail to achieve it’s intention: If the agent believes its intention will not occur, it must drop that intention.
+**输入定义**：
+**原始日志** $\mathcal L$：$\mathcal L=\langle l_1,l_2,\ldots,l_j\rangle$ .  $l_j$表示目标 Agent 的一条原始日志记录。
+**任务规范** $\mathcal T$：Task Specification 描述 Agent 应当完成的任务。任务规范为意图重建提供外部目标依据。
+**理性约束集合** $\mathcal C$：这是从 Cohen–Levesque 理性意图理论中引入的五项约束。限制 IRA 推断出来的意图，使其符合一定的合理性要求。
+**输出定义**：
+IRA 输出一个结构化意图序列：$\mathcal I_{\mathrm{eval}} = \langle i_{\mathrm{eval},1}, i_{\mathrm{eval},2}, \ldots, i_{\mathrm{eval},j} \rangle$ ，$i_{\mathrm{eval},j}$表示与日志记录 \(l_j\) 对应的重建意图。
+完整过程定义为：$\mathcal I_{\mathrm{eval}} = \mathcal F_{\mathrm{eval}} (\mathcal L,\mathcal T,\mathcal C)$
+$mathcal F_{\mathrm{eval}}$：基于 LLM 的理性意图推断过程。
+$\mathcal L$：原始行为日志。
+$\mathcal T$：任务规范。
+$mathcal C$：理性约束集合。
+$\mathcal I_{\mathrm{eval}}$：重建后的意图序列。
+这里的意图是经过任务上下文和理性约束重建的预期意图，并不是直接观测到的真实心理状态。
+**4.3 Attribution Analysis：意图与行为的一致性验证**
+Agent 实际执行的动作，是否真正实现了重建出来的合理意图？
+一致性判断函数:$mathcal C(i,l) $
+其中：
+$i$：重建出来的意图。
+$l$：对应的实际行为日志。
+$C$：基于 LLM 的语义一致性判断。
+函数输出：$\mathcal C(i,l)\in\{0,0.5,1\}$
+
+|分数|含义|判断|
+|---|---|---|
+|1|Full Consistency|行为完全符合意图|
+|0.5|Partial Consistency|行为部分符合意图|
+|0|Inconsistency|行为与意图不一致|
+
+**如何确定故障步骤？**
+Deviation Point：$j^*= \min\left\{ j\mid \mathcal C(i_{\mathrm{eval},j},l_j)<0.5 \right\}$
+$j$：当前日志步骤。
+$i_{\mathrm{eval},j}$：该步骤对应的预期意图。
+$l_j$：该步骤实际执行的行为。
+$\mathcal C$：一致性评分。
+$\min$：寻找最早出现偏差的位置。
