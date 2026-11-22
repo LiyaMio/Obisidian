@@ -34,12 +34,12 @@ MAS 虽然具备较强的协作能力，但内部存在明显的脆弱性（Inte
 **2.1：LLM-based MAS**
 **2.2：Fragility and Error Patterns in MAS**
 
-|错误类别|含义|示例|
-|---|---|---|
-|Cognitive and Reasoning Mistakes|认知与推理错误|数学推理错误、事实判断错误|
-|Interaction and Collaboration Conflicts|交互与协作冲突|Agent 间信息不一致、协作冲突|
-|Planning and Execution Deviations|规划与执行偏差|规划错误、工具执行偏离|
-|System and Validation Failures|系统与验证失败|系统故障、结果验证失败|
+| 错误类别                                    | 含义      | 示例                |
+| --------------------------------------- | ------- | ----------------- |
+| Cognitive and Reasoning Mistakes        | 认知与推理错误 | 数学推理错误、事实判断错误     |
+| Interaction and Collaboration Conflicts | 交互与协作冲突 | Agent 间信息不一致、协作冲突 |
+| Planning and Execution Deviations       | 规划与执行偏差 | 规划错误、工具执行偏离       |
+| System and Validation Failures          | 系统与验证失败 | 系统故障、结果验证失败       |
 **2.3：Failure Attribution for MAS**
 1. LLM-based Diagnostic Methods
 2. Decoupled Semantic Extraction and Diagnostic Logic

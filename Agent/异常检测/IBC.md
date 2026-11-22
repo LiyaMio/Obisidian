@@ -82,23 +82,23 @@ IRA 输出一个结构化意图序列：$\mathcal I_{\mathrm{eval}} = \langle i_
 $mathcal F_{\mathrm{eval}}$：基于 LLM 的理性意图推断过程。
 $\mathcal L$：原始行为日志。
 $\mathcal T$：任务规范。
-$mathcal C$：理性约束集合。
+$\mathcal C$：理性约束集合。
 $\mathcal I_{\mathrm{eval}}$：重建后的意图序列。
 这里的意图是经过任务上下文和理性约束重建的预期意图，并不是直接观测到的真实心理状态。
 **4.3 Attribution Analysis：意图与行为的一致性验证**
 Agent 实际执行的动作，是否真正实现了重建出来的合理意图？
-一致性判断函数:$mathcal C(i,l) $
+一致性判断函数:$\mathcal C(i,l)$
 其中：
 $i$：重建出来的意图。
 $l$：对应的实际行为日志。
 $C$：基于 LLM 的语义一致性判断。
 函数输出：$\mathcal C(i,l)\in\{0,0.5,1\}$
 
-|分数|含义|判断|
-|---|---|---|
-|1|Full Consistency|行为完全符合意图|
-|0.5|Partial Consistency|行为部分符合意图|
-|0|Inconsistency|行为与意图不一致|
+| 分数  | 含义                  | 判断       |
+| --- | ------------------- | -------- |
+| 1   | Full Consistency    | 行为完全符合意图 |
+| 0.5 | Partial Consistency | 行为部分符合意图 |
+| 0   | Inconsistency       | 行为与意图不一致 |
 
 **如何确定故障步骤？**
 Deviation Point：$j^*= \min\left\{ j\mid \mathcal C(i_{\mathrm{eval},j},l_j)<0.5 \right\}$
