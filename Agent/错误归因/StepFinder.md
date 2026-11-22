@@ -30,3 +30,27 @@ MAS 虽然具备较强的协作能力，但内部存在明显的脆弱性（Inte
 - Position Bias；
 调整最终得分
 ## Related Work
+**2.1：LLM-based MAS**
+**2.2：Fragility and Error Patterns in MAS**
+
+|错误类别|含义|示例|
+|---|---|---|
+|Cognitive and Reasoning Mistakes|认知与推理错误|数学推理错误、事实判断错误|
+|Interaction and Collaboration Conflicts|交互与协作冲突|Agent 间信息不一致、协作冲突|
+|Planning and Execution Deviations|规划与执行偏差|规划错误、工具执行偏离|
+|System and Validation Failures|系统与验证失败|系统故障、结果验证失败|
+**2.3：Failure Attribution for MAS**
+1. LLM-based Diagnostic Methods
+2. Decoupled Semantic Extraction and Diagnostic Logic
+
+| 方法      | 主要机制          |
+| ------- | ------------- |
+| FAMAS   | 多次执行 + 统计谱分析  |
+| CDC-MAS | 因果推断 + 依赖关系建模 |
+## Preliminaries
+轨迹：$\tau=\langle s_0,a_0,s_1,a_1,\ldots,s_T\rangle$，系统执行任务的过程被表示为一串交替出现的状态与动作。
+## Methodology
+(1)轨迹编码 Trajectory Encoding. We encode both the content and the agent of each step in MAS trajectories into embeddings, thereby constructing the entire execution trajectory as a temporal semantic sequence for subsequent model processing. 
+(2) 时序特征与跨步骤交互建模Model Architecture. To capture both temporal dependencies and cross-step interactions, we design a network architecture that combines temporal modeling and agent-aware interaction modeling to learn representations of the temporal semantic sequences. For each step, an initial error score is computed, which is then adjusted using multi-scale differences and position bias to obtain the final anomaly score. 
+(3)模型训练目标 Loss Function. The model is primarily trained with a supervised classification loss, supplemented by a self-supervised auxiliary loss that predicts the embedding of each step. This enhances trajectory pattern representation and improves the stability and generalization of the failure attribution model.
+![[StepFinder-1795316006149.webp]]
