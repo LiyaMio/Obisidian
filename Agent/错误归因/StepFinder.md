@@ -209,13 +209,13 @@ $\ell_t^{final}=\ell_t+\beta\cdot\Delta_t+\gamma\cdot b_t$
 **4.4.4 Temporal Consistency Head（时序一致性预测头）**
 这一模块容易和 Multi-Scale Differencing 混淆，但二者的目标不同。
 
-|   |   |   |
-|---|---|---|
-|**比较**|**Multi-Scale Differencing**|**Temporal Consistency Head**|
-|核心目的|衡量隐藏状态变化|学习隐藏状态的演化规律|
-|计算方式|多尺度差分|下一步状态预测|
-|使用阶段|参与最终评分|只用于训练|
-|是否需要辅助预测网络|不需要|需要|
+|            |                              |                               |
+| ---------- | ---------------------------- | ----------------------------- |
+| **比较**     | **Multi-Scale Differencing** | **Temporal Consistency Head** |
+| 核心目的       | 衡量隐藏状态变化                     | 学习隐藏状态的演化规律                   |
+| 计算方式       | 多尺度差分                        | 下一步状态预测                       |
+| 使用阶段       | 参与最终评分                       | 只用于训练                         |
+| 是否需要辅助预测网络 | 不需要                          | 需要                            |
 作者引入一个轻量级预测函数：$\hat h_{t+1}=f_\theta(h_t)$
 其中：
 - $h_t$：当前步骤的隐藏表示；
