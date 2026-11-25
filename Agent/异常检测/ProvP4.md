@@ -115,6 +115,7 @@ NetHCF 是一种基于跳数过滤（Hop-Count Filtering，HCF）的网络安全
 它的基本思想是：对于一个合法 IP 地址，其数据包通常经过相对稳定的网络路径，因此可以维护 IP 地址与预期跳数之间的映射关系。
 数据平面根据 TCP 握手过程以及数据包的 TTL 信息计算跳数，并将相关更新发送给控制平面。控制平面随后修改匹配动作表中的规则。
 ![[ProvP4-1795572053146.webp]]
+内部污染攻击（State Poisoning Attack）
 
 |序号|操作|具体过程|
 |---|---|---|
@@ -126,3 +127,60 @@ NetHCF 是一种基于跳数过滤（Hop-Count Filtering，HCF）的网络安全
 |⑥|流表规则更新|控制器向数据平面下发 MAT Rule 修改指令，使交换机按照新的跳数 \(HC_B\) 执行过滤。|
 异常结果不一定意味着当前行为本身存在异常，异常也可能来自该行为所依赖的历史状态。
 **2.2 Current Limitations and Opportunities**
+![[ProvP4-1795590150499.webp]]
+Using the state-of-the-art PicoSDN tool for SDN attack analysis.
+Limitation (L1): Incomplete view of internal data plane effects.
+Limitation (L2): Lack of stateful investigative capabilities.
+
+| 比较维度  | PicoSDN   | ProvP4      |     |
+| ----- | --------- | ----------- | --- |
+| 溯源主体  | 交换机       | 交换机、控制器     |     |
+| 行为粒度  | 控制平面活动    | 控制平面与数据平面活动 |     |
+| 内部状态  | 图中缺少相关状态  | 寄存器、控制平面状态  |     |
+| 状态演化  | 图中未明确展示   | 新旧规则的派生关系   |     |
+| 跨平面追踪 | 消息与设备关联   | 消息与具体生成活动关联 |     |
+| 调查深度  | 追踪至消息来源设备 | 深入数据平面内部状态  |     |
+Figure 3 对比了 PicoSDN 与 ProvP4 在可编程数据平面攻击场景下的溯源分析能力。传统 PicoSDN 只能从异常流表规则追踪至控制平面事件监听活动、PacketIn 消息及其所属交换机，无法进一步解释消息的内部生成机制。ProvP4 通过引入数据平面处理活动、内部寄存器状态、控制平面状态对象以及状态派生关系，将控制平面和数据平面的行为与状态演化统一建模，实现从异常规则到数据平面内部状态的跨平面溯源，从而为攻击根因调查提供更加完整的运行时依赖证据。
+## 3 ProvP4 Goals and Challenges
+**Design Goals：**
+Goal (G1): Complete Observability.
+ProvP4 必须能够提供全面的网络运行视图，覆盖三个方面：
+
+| 可观测对象                    | 具体内容             |
+| ------------------------ | ---------------- |
+| Data Plane               | 数据包处理、内部状态读写     |
+| Control Plane            | 控制事件处理、网络状态更新    |
+| Cross-plane Interactions | 控制平面与数据平面之间的信息交互 |
+Goal (G2): Analysis Capabilities.
+仅仅采集大量运行时事件，并不能直接帮助安全人员完成攻击调查。
+ProvP4 还需要提供相应的调查查询能力（Investigative Queries），并满足三个要求：
+
+|要求|含义|
+|---|---|
+|Minimal Knowledge|调查人员只需要掌握少量关于底层 P4 程序的知识|
+|Generic|查询机制不应仅针对某一种攻击|
+|Cross-program|能够适用于不同类型的 P4 程序|
+ G3：Security（安全性）
+如果攻击者能够绕过或者篡改溯源采集机制，那么生成的溯源图就不能作为可信的调查证据。
+因此，作者希望 ProvP4 作为一种 **Reference Monitor（引用监控器）** 运行。
+**技术挑战**
+TC1：No Clear Userspace/Kernelspace Boundary
+技术挑战一：缺少明确的用户空间与内核空间边界。
+Program Analysis（程序分析）：识别 P4 程序中的内存声明、状态操作及跨平面通信操作。
+Program Instrumentation（程序插桩）：在原始 P4 程序中添加溯源记录语句，将运行时信息写入专门的 Provenance Registers，并通过编译过程实施隔离。
+(TC2): Reasoning Capabilities.
+技术挑战二：面向内部状态的推理与分析能力。
+TC2 的核心解决方案是构建能够表达 P4 程序状态语义的溯源模型，并通过活动划分与状态版本化提高依赖关系的精确性。
+TC3：Data Plane Event Scaling Capabilities
+技术挑战三：数据平面事件的规模与采集开销。
+大量数据包可能只是按照现有规则进行正常转发，并没有修改相关持久化状态。以具有诊断价值的状态操作为中心进行选择性溯源采集，而不是进行全量数据包日志记录。利用程序分析识别会影响关键状态变量的代码路径和操作，然后仅在相关位置插入溯源采集代码。
+
+|技术挑战|核心问题|解决方案|
+|---|---|---|
+|TC1：安全边界缺失|在哪里采集，如何安全采集？|以 P4 程序为共同抽象层，实施隔离式插桩|
+|TC2：推理能力不足|如何表达状态演化与依赖关系？|状态感知溯源模型、活动划分、版本化|
+|TC3：事件规模过大|应该采集哪些事件，如何降低开销？|程序分析与针对性插桩|
+## 4 Provenance Model
+We define a provenance model of *relevant objects, states, identifiers, and system principals (or agents)* for programmable data plane operations, inspired by W3C PROV [63] and incorporating programmable network semantics.
+**Definitions.**  A *provenance graph* is a directed acyclic graph (DAG) G (V , E), where a node v ∈ V represents an Agent, Entity, or Activity, with the various subtypes listed and described in Table 2. Entities denote network objects, activities represent packet or event processing, and agents control network actions. An edge e ∈ E belongs to one of {Used, WasGeneratedBy, WasDerivedFrom, WasAssociatedWith}, capturing relationships such as read/write, modification, or attribution across data and control plane.
+
