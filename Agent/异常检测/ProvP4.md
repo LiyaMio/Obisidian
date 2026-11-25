@@ -184,3 +184,36 @@ TC3：Data Plane Event Scaling Capabilities
 We define a provenance model of *relevant objects, states, identifiers, and system principals (or agents)* for programmable data plane operations, inspired by W3C PROV [63] and incorporating programmable network semantics.
 **Definitions.**  A *provenance graph* is a directed acyclic graph (DAG) G (V , E), where a node v ∈ V represents an Agent, Entity, or Activity, with the various subtypes listed and described in Table 2. Entities denote network objects, activities represent packet or event processing, and agents control network actions. An edge e ∈ E belongs to one of {Used, WasGeneratedBy, WasDerivedFrom, WasAssociatedWith}, capturing relationships such as read/write, modification, or attribution across data and control plane.
 
+| 节点       | 回答的问题                                                                                                                                           |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Agent    | 谁执行了相关活动？A data or control plane object that incorporates state  (e.g., MATRule, Register, Counter, PacketIn, and PacketOut).                   |
+| Activity | 发生了什么处理过程？An abstraction of processing events or packets inside  the control or data plane (e.g., PacketProcessor and EventProcessor).          |
+| Entity   | 处理过程中使用或生成了什么对象？A system principal responsible for performing an activity  (e.g., Switch, Switch port, Control plane program, and Application). |
+五种典型 Entity。
+
+| Entity 子类型 | 含义             |     |
+| ---------- | -------------- | --- |
+| MATRule    | 匹配动作表中的具体规则    |     |
+| Register   | 数据平面的寄存器状态     |     |
+| Counter    | 数据平面的计数器状态     |     |
+| PacketIn   | 数据平面发送至控制平面的消息 |     |
+| PacketOut  | 控制平面发送至数据平面的消息 |     |
+Agent 用于描述活动的执行归属。
+
+|Agent 子类型|含义|
+|---|---|
+|Switch|执行数据包处理的交换机|
+|Switch Port|与相关处理活动关联的交换机端口|
+|Control Plane Program|执行控制平面逻辑的程序|
+|Application|网络管理或安全应用|
+四类边关系总结
+
+|关系|起始节点|目标节点|对应语义|
+|---|---|---|---|
+|Used|Activity|Entity|读取、使用|
+|WasGeneratedBy|Entity|Activity|写入、生成|
+|WasDerivedFrom|Entity|Entity|修改、派生|
+|WasAssociatedWith|Activity|Agent|执行主体关联|
+**Partitioning and Versioning.**
+A P4 program can be viewed as a  long-running process executing multiple actions on incoming packets, causing various state changes.
+Dependency Explosion（依赖爆炸）
