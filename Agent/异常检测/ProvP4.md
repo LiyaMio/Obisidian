@@ -208,12 +208,12 @@ Agent 用于描述活动的执行归属。
 |Application|网络管理或安全应用|
 四类边关系总结
 
-|关系|起始节点|目标节点|对应语义|
-|---|---|---|---|
-|Used|Activity|Entity|读取、使用|
-|WasGeneratedBy|Entity|Activity|写入、生成|
-|WasDerivedFrom|Entity|Entity|修改、派生|
-|WasAssociatedWith|Activity|Agent|执行主体关联|
+| 关系                | 起始节点     | 目标节点     | 对应语义   |
+| ----------------- | -------- | -------- | ------ |
+| Used              | Activity | Entity   | 读取、使用  |
+| WasGeneratedBy    | Entity   | Activity | 写入、生成  |
+| WasDerivedFrom    | Entity   | Entity   | 修改、派生  |
+| WasAssociatedWith | Activity | Agent    | 执行主体关联 |
 **Partitioning and Versioning.**
 A P4 program can be viewed as a  long-running process executing multiple actions on incoming packets, causing various state changes.
 Dependency Explosion（依赖爆炸）
